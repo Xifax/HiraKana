@@ -16,8 +16,8 @@ namespace HiraKana
         private static readonly int KATAKANA_END = 0x30FA;
 
         // Options
-        static Boolean IME_MODE = false;
-        static Boolean USE_OBSOLETE_KANA = false;
+        private Boolean IME_MODE = false;
+        private Boolean USE_OBSOLETE_KANA = false;
 
         public KanaTools() { }
 
@@ -240,19 +240,16 @@ namespace HiraKana
                     }
 
                     // Try to parse the chunk
-                    try {
-                        kanaChar = RomajiToKana.table[chunkLC];
-                    // If could not find key, then try again!
-                    } catch(Exception) {
-                        kanaChar = null;
-                    }
+                    kanaChar = null;
+                    RomajiToKana.table.TryGetValue(chunkLC, out kanaChar);
 
-                    // If successfully parsed - continue
+                    // Continue, if found this item in table
                     if (kanaChar != null)
                     {
                         break;
                     }
 
+                    // If could not find key, then try again with the smaller chunk
                     chunkSize--;
                 }
 
@@ -333,12 +330,9 @@ namespace HiraKana
                         break;
                     }
 
-                    try {
-                        romaChar = KanaToRomaji.table[chunk];
-                    } catch(Exception)
-                    {
-                        romaChar = null;
-                    }
+                    // Try to parse
+                    romaChar = null;
+                    KanaToRomaji.table.TryGetValue(chunk, out romaChar);
 
                     if ((romaChar != null) && nextCharIsDoubleConsonant)
                     {
