@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
@@ -10,7 +11,7 @@ namespace HiraKana
     {
         static void Main()
         {
-            Debug.WriteLine(new Romaji("korehahirakanadesu.").ToHiaragana());
+            Debug.WriteLine(new Romaji("korehahirakananodesu").ToHiaragana());
         }
     }
 
@@ -360,15 +361,14 @@ namespace HiraKana
         }
 
 
+        // Convert punctuations: long space and dash
         private String convertPunctuation(String input)
         {
-            // Long space to space
             if (input.Equals(Convert.ToString(('　'))))
             {
                 return Convert.ToString(' ');
             }
 
-            // Dash to long dash
             if (input.Equals(Convert.ToString('-')))
             {
                 return Convert.ToString('ー');
