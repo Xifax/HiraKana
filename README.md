@@ -11,19 +11,19 @@ using HiraKana;
 
 Debug.WriteLine(
 	new Romaji("korehahirakananodesu").ToHiragana()
-);
+); // これはひらかなのです
 
 Debug.WriteLine(
-	new Romaji("korehahirakananodesu").useObsoleteKana(true).ToKatakana()
-);
+	new Romaji("wawiwo").useObsoleteKana(true).ToKatakana()
+); // ワヰヲ
 
 /* Direct */
 
 Debug.WriteLine(
 	new KanaTools().toHiragana("sorehaZOMUBIEdesuka")
-);
+); // それはぞむびえですか
 
 Debug.WriteLine(
 	new KanaTools().isKana("あいうえお")
-);
+); // False
 ```

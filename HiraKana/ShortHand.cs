@@ -9,6 +9,7 @@ namespace HiraKana
         static void Main()
         {
             Debug.WriteLine(new Romaji("korehahirakananodesu").ToHiragana());
+            Debug.WriteLine(new Romaji("wawiwo").useObsoleteKana(true).ToKatakana());
             Debug.WriteLine(new KanaTools().toHiragana("sorehaZOMUBIEdesuka"));
             Debug.WriteLine(new KanaTools().isKana("あいうえお"));
         }
