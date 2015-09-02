@@ -25,5 +25,5 @@ Debug.WriteLine(
 
 Debug.WriteLine(
 	new KanaTools().isKana("あいうえお")
-); // False
+); // True
 ```
