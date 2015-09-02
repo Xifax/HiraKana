@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="TestUtilityMethods.cs" />
     <Compile Include="TestImeMode.cs" />
     <Compile Include="TestRomajiToHiragana.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

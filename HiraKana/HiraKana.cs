@@ -109,7 +109,7 @@ namespace HiraKana
         {
             return allTrue(input, delegate (String str)
             {
-                return (isKatakana(str) || isKatakana(str));
+                return (isKatakana(str) || isHiragana(str));
             });
         }
 
