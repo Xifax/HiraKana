@@ -37,6 +37,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HiraKana.cs" />
+    <Compile Include="KanaToRomaji.cs" />
+    <Compile Include="RomajiToKana.cs" />
+    <Compile Include="ShortHand.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

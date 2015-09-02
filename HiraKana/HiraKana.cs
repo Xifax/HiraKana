@@ -1,52 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace HiraKana
 {
-    /* This is an entry point, in case someone wants to run an example. */
-    static class Example
-    {
-        static void Main()
-        {
-            Debug.WriteLine(new Romaji("korehahirakananodesu").ToHiaragana());
-        }
-    }
-
-    /* Shorthands */
-    public class Romaji
-    {
-        String romaji;
-
-        public Romaji(String romaji)
-        {
-            this.romaji = romaji;
-        }
-
-        public String ToHiaragana()
-        {
-            return new KanaTools().toHiragana(romaji);
-        }
-
-    }
-
-    public class Kana
-    {
-        String kana;
-
-        public Kana(String kana)
-        {
-            this.kana = kana;
-        }
-
-        public String ToRomaji()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     /* Conversion class */
     class KanaTools
     {
@@ -58,59 +15,15 @@ namespace HiraKana
         private static readonly int KATAKANA_START = 0x30A1;
         private static readonly int KATAKANA_END = 0x30FA;
 
-        // Romaji-to-hiragana table
-        private static readonly IDictionary<string, string> romajiKana =
-            new Dictionary<string, string>
-        {
-            {"a", "あ"}, {"i", "い"}, {"u", "う"}, {"e", "え"}, {"o", "お"}, {"yi", "い"}, {"wu", "う"},
-            {"whu", "う"}, {"xa", "ぁ"}, {"xi", "ぃ"}, {"xu", "ぅ"}, {"xe", "ぇ"}, {"xo", "ぉ"}, {"xyi", "ぃ"},
-            {"xye", "ぇ"}, {"ye", "いぇ"}, {"wha", "うぁ"}, {"whi", "うぃ"}, {"whe", "うぇ"}, {"who", "うぉ"},
-            {"wi", "うぃ"}, {"we", "うぇ"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"vu", "ゔ"}, {"ve", "ゔぇ"},
-            {"vo", "ゔぉ"}, {"vya", "ゔゃ"}, {"vyi", "ゔぃ"}, {"vyu", "ゔゅ"}, {"vye", "ゔぇ"}, {"vyo", "ゔょ"},
-            {"ka", "か"}, {"ki", "き"}, {"ku", "く"}, {"ke", "け"}, {"ko", "こ"}, {"lka", "ヵ"}, {"lke", "ヶ"},
-            {"xka", "ヵ"}, {"xke", "ヶ"}, {"kya", "きゃ"}, {"kyi", "きぃ"}, {"kyu", "きゅ"}, {"kye", "きぇ"},
-            {"kyo", "きょ"}, {"qya", "くゃ"}, {"qyu", "くゅ"}, {"qyo", "くょ"}, {"qwa", "くぁ"}, {"qwi", "くぃ"},
-            {"qwu", "くぅ"}, {"qwe", "くぇ"}, {"qwo", "くぉ"}, {"qa", "くぁ"}, {"qi", "くぃ"}, {"qe", "くぇ"},
-            {"qo", "くぉ"}, {"kwa", "くぁ"}, {"qyi", "くぃ"}, {"qye", "くぇ"}, {"ga", "が"}, {"gi", "ぎ"}, {"gu", "ぐ"},
-            {"ge", "げ"}, {"go", "ご"}, {"gya", "ぎゃ"}, {"gyi", "ぎぃ"}, {"gyu", "ぎゅ"}, {"gye", "ぎぇ"}, {"gyo", "ぎょ"},
-            {"gwa", "ぐぁ"}, {"gwi", "ぐぃ"}, {"gwu", "ぐぅ"}, {"gwe", "ぐぇ"}, {"gwo", "ぐぉ"}, {"sa", "さ"}, {"si", "し"},
-            {"shi", "し"}, {"su", "す"}, {"se", "せ"}, {"so", "そ"}, {"za", "ざ"}, {"zi", "じ"}, {"zu", "ず"}, {"ze", "ぜ"},
-            {"zo", "ぞ"}, {"ji", "じ"}, {"sya", "しゃ"}, {"syi", "しぃ"}, {"syu", "しゅ"}, {"sye", "しぇ"}, {"syo", "しょ"},
-            {"sha", "しゃ"}, {"shu", "しゅ"}, {"she", "しぇ"}, {"sho", "しょ"}, {"swa", "すぁ"}, {"swi", "すぃ"},
-            {"swu", "すぅ"}, {"swe", "すぇ"}, {"swo", "すぉ"}, {"zya", "じゃ"}, {"zyi", "じぃ"}, {"zyu", "じゅ"},
-            {"zye", "じぇ"}, {"zyo", "じょ"}, {"ja", "じゃ"}, {"ju", "じゅ"}, {"je", "じぇ"}, {"jo", "じょ"}, {"jya", "じゃ"},
-            {"jyi", "じぃ"}, {"jyu", "じゅ"}, {"jye", "じぇ"}, {"jyo", "じょ"}, {"ta", "た"}, {"ti", "ち"}, {"tu", "つ"},
-            {"te", "て"}, {"to", "と"}, {"chi", "ち"}, {"tsu", "つ"}, {"ltu", "っ"}, {"xtu", "っ"}, {"tya", "ちゃ"},
-            {"tyi", "ちぃ"}, {"tyu", "ちゅ"}, {"tye", "ちぇ"}, {"tyo", "ちょ"}, {"cha", "ちゃ"}, {"chu", "ちゅ"},
-            {"che", "ちぇ"}, {"cho", "ちょ"}, {"cya", "ちゃ"}, {"cyi", "ちぃ"}, {"cyu", "ちゅ"}, {"cye", "ちぇ"},
-            {"cyo", "ちょ"}, {"tsa", "つぁ"}, {"tsi", "つぃ"}, {"tse", "つぇ"}, {"tso", "つぉ"}, {"tha", "てゃ"},
-            {"thi", "てぃ"}, {"thu", "てゅ"}, {"the", "てぇ"}, {"tho", "てょ"}, {"twa", "とぁ"}, {"twi", "とぃ"},
-            {"twu", "とぅ"}, {"twe", "とぇ"}, {"two", "とぉ"}, {"da", "だ"}, {"di", "ぢ"}, {"du", "づ"}, {"de", "で"},
-            {"do", "ど"}, {"dya", "ぢゃ"}, {"dyi", "ぢぃ"}, {"dyu", "ぢゅ"}, {"dye", "ぢぇ"}, {"dyo", "ぢょ"}, {"dha", "でゃ"},
-            {"dhi", "でぃ"}, {"dhu", "でゅ"}, {"dhe", "でぇ"}, {"dho", "でょ"}, {"dwa", "どぁ"}, {"dwi", "どぃ"}, {"dwu", "どぅ"},
-            {"dwe", "どぇ"}, {"dwo", "どぉ"}, {"na", "な"}, {"ni", "に"}, {"nu", "ぬ"}, {"ne", "ね"}, {"no", "の"},
-            {"nya", "にゃ"}, {"nyi", "にぃ"}, {"nyu", "にゅ"}, {"nye", "にぇ"}, {"nyo", "にょ"}, {"ha", "は"}, {"hi", "ひ"},
-            {"hu", "ふ"}, {"he", "へ"}, {"ho", "ほ"}, {"fu", "ふ"}, {"hya", "ひゃ"}, {"hyi", "ひぃ"}, {"hyu", "ひゅ"},
-            {"hye", "ひぇ"}, {"hyo", "ひょ"}, {"fya", "ふゃ"}, {"fyu", "ふゅ"}, {"fyo", "ふょ"}, {"fwa", "ふぁ"}, {"fwi", "ふぃ"},
-            {"fwu", "ふぅ"}, {"fwe", "ふぇ"}, {"fwo", "ふぉ"}, {"fa", "ふぁ"}, {"fi", "ふぃ"}, {"fe", "ふぇ"}, {"fo", "ふぉ"},
-            {"fyi", "ふぃ"}, {"fye", "ふぇ"}, {"ba", "ば"}, {"bi", "び"}, {"bu", "ぶ"}, {"be", "べ"}, {"bo", "ぼ"}, {"bya", "びゃ"},
-            {"byi", "びぃ"}, {"byu", "びゅ"}, {"bye", "びぇ"}, {"byo", "びょ"}, {"pa", "ぱ"}, {"pi", "ぴ"}, {"pu", "ぷ"}, {"pe", "ぺ"},
-            {"po", "ぽ"}, {"pya", "ぴゃ"}, {"pyi", "ぴぃ"}, {"pyu", "ぴゅ"}, {"pye", "ぴぇ"}, {"pyo", "ぴょ"}, {"ma", "ま"},
-            {"mi", "み"}, {"mu", "む"}, {"me", "め"}, {"mo", "も"}, {"mya", "みゃ"}, {"myi", "みぃ"}, {"myu", "みゅ"}, {"mye", "みぇ"},
-            {"myo", "みょ"}, {"ya", "や"}, {"yu", "ゆ"}, {"yo", "よ"}, {"xya", "ゃ"}, {"xyu", "ゅ"}, {"xyo", "ょ"}, {"ra", "ら"},
-            {"ri", "り"}, {"ru", "る"}, {"re", "れ"}, {"ro", "ろ"}, {"rya", "りゃ"}, {"ryi", "りぃ"}, {"ryu", "りゅ"}, {"rye", "りぇ"},
-            {"ryo", "りょ"}, {"la", "ら"}, {"li", "り"}, {"lu", "る"}, {"le", "れ"}, {"lo", "ろ"}, {"lya", "りゃ"}, {"lyi", "りぃ"},
-            {"lyu", "りゅ"}, {"lye", "りぇ"}, {"lyo", "りょ"}, {"wa", "わ"}, {"wo", "を"}, {"lwe", "ゎ"}, {"xwa", "ゎ"}, {"nn", "ん"},
-            {"'n '", "ん"}, {"xn", "ん"}, {"ltsu", "っ"}, {"xtsu", "っ"},
-        };
-
         // Options
         static Boolean IME_MODE = false;
         static Boolean USE_OBSOLETE_KANA = false;
 
         public KanaTools() { }
 
-        public KanaTools enableIme(Boolean mode)
+        /* Options */
+
+        public KanaTools useIme(Boolean mode)
         {
             IME_MODE = mode;
             return this;
@@ -121,6 +34,83 @@ namespace HiraKana
             USE_OBSOLETE_KANA = flag;
             return this;
         }
+
+        /* Public API */
+
+        public String toHiragana(String input)
+        {
+            if (isRomaji(input))
+            {
+                return romajiToHiragana(input);
+            }
+
+            if (isKatakana(input))
+            {
+                return katakanaToHiragana(input);
+            }
+
+            return input;
+        }
+
+        public String toKatakana(String input)
+        {
+            if (isHiragana(input))
+            {
+                return hiraganaToKatakana(input);
+            }
+
+            if (isRomaji(input))
+            {
+                return hiraganaToKatakana(romajiToHiragana(input));
+            }
+
+            return input;
+        }
+
+        public String toRomaji(String input)
+        {
+            return hiraganaToRomaji(input);
+        }
+
+        public String toKana(String input)
+        {
+            return romajiToKana(input, false);
+        }
+
+
+        public Boolean isHiragana(String input)
+        {
+            return allTrue(input, delegate (String str)
+            {
+                return isCharHiragana(str[0]);
+            });
+        }
+
+        public Boolean isKatakana(String input)
+        {
+            return allTrue(input, delegate (String str)
+            {
+                return isCharKatakana(str[0]);
+            });
+        }
+
+        public Boolean isKana(String input)
+        {
+            return allTrue(input, delegate (String str)
+            {
+                return (isKatakana(str) || isKatakana(str));
+            });
+        }
+
+        public Boolean isRomaji(String input)
+        {
+            return allTrue(input, delegate (String str)
+            {
+                return (!isKatakana(str) || (!isKatakana(str)));
+            });
+        }
+
+
 
         /* Character check methods */
 
@@ -159,41 +149,6 @@ namespace HiraKana
             return isCharHiragana(chr) || isCharKatakana(chr);
         }
 
-        /* KanaTools methods */
-
-        public Boolean isHiragana(String input)
-        {
-            return allTrue(input, delegate (String str)
-            {
-                return isCharHiragana(str[0]);
-            });
-        }
-
-        public Boolean isKatakana(String input)
-        {
-            return allTrue(input, delegate (String str)
-            {
-                return isCharKatakana(str[0]);
-            });
-        }
-
-        public Boolean isKana(String input)
-        {
-            return allTrue(input, delegate (String str)
-            {
-                return (isKatakana(str) || isKatakana(str));
-            });
-        }
-
-        public Boolean isRomaji(String input)
-        {
-            return allTrue(input, delegate (String str)
-            {
-                return (!isKatakana(str) || (!isKatakana(str)));
-            });
-        }
-
-
         /* Utility methods */
 
         private Boolean allTrue(String stringToCheck, Func<String, Boolean> method)
@@ -208,24 +163,8 @@ namespace HiraKana
             return true;
         }
 
+
         /* Conversions */
-
-        public String toHiragana(String input)
-        {
-            if (isRomaji(input))
-            {
-                return romajiToHiragana(input);
-            }
-
-            /*
-            if (isKatakana(input))
-            {
-                return katakanaToHiragana(input);
-            }
-            */
-
-            return input;
-        }
 
         private String romajiToHiragana(String romaji)
         {
@@ -301,7 +240,7 @@ namespace HiraKana
 
                     // Try to parse the chunk
                     try {
-                        kanaChar = romajiKana[chunkLC];
+                        kanaChar = RomajiToKana.table[chunkLC];
                     // If could not find key, then try again!
                     } catch(Exception) {
                         kanaChar = null;
@@ -342,7 +281,6 @@ namespace HiraKana
                     }
                 }
 
-                /*
                 if (!ignoreCase)
                 {
                     if (isCharInRange(chunk[0], UPPERCASE_START, UPPERCASE_END))
@@ -350,7 +288,6 @@ namespace HiraKana
                         kanaChar = hiraganaToKatakana(kanaChar);
                     }
                 }
-                */
 
                 kana += kanaChar;
 
@@ -358,6 +295,120 @@ namespace HiraKana
             }
 
             return kana;
+        }
+
+        public String hiraganaToRomaji(String hira)
+        {
+            if (isRomaji(hira))
+            {
+                return hira;
+            }
+
+            String chunk = "";
+            int chunkSize;
+            int cursor = 0;
+            int len = hira.Length;
+            int maxChunk = 2;
+            Boolean nextCharIsDoubleConsonant = false;
+            String roma = "";
+            String romaChar = null;
+
+            while (cursor < len)
+            {
+                chunkSize = Math.Min(maxChunk, len - cursor);
+                while (chunkSize > 0)
+                {
+                    chunk = hira.Substring(cursor, chunkSize);
+
+                    if (isKatakana(chunk))
+                    {
+                        chunk = katakanaToHiragana(chunk);
+                    }
+
+                    if (Convert.ToString(chunk[0]).Equals("っ") && chunkSize == 1 && cursor < (len - 1))
+                    {
+                        nextCharIsDoubleConsonant = true;
+                        romaChar = "";
+                        break;
+                    }
+
+                    try {
+                        romaChar = RomajiToKana.table[chunk];
+                    } catch(Exception)
+                    {
+                        romaChar = null;
+                    }
+
+                    if ((romaChar != null) && nextCharIsDoubleConsonant)
+                    {
+                        romaChar = romaChar[0] + romaChar;
+                        nextCharIsDoubleConsonant = false;
+                    }
+
+                    if (romaChar != null)
+                    {
+                        break;
+                    }
+
+                    chunkSize--;
+                }
+                if (romaChar == null)
+                {
+                    romaChar = chunk;
+                }
+
+                roma += romaChar;
+                cursor += chunkSize > 0 ? chunkSize : 1;
+            }
+            return roma;
+        }
+
+        private String hiraganaToKatakana(String hira)
+        {
+            int code;
+            String kata = "";
+
+            for (int i = 0; i < hira.Length; i++)
+            {
+                char hiraChar = hira[i];
+
+                if (isCharHiragana(hiraChar))
+                {
+                    code = (int)hiraChar;
+                    code += KATAKANA_START - HIRAGANA_START;
+                    kata += Convert.ToString(Convert.ToChar(code));
+                }
+                else
+                {
+                    kata += hiraChar;
+                }
+            }
+
+            return kata;
+        }
+
+        private String katakanaToHiragana(String kata)
+        {
+            int code;
+            String hira = "";
+
+            for (int i = 0; i < kata.Length; i++)
+            {
+                char kataChar = kata[i];
+
+                if (isCharKatakana(kataChar))
+                {
+                    code = (int)kataChar;
+                    code += HIRAGANA_START - KATAKANA_START;
+                    hira += Convert.ToString(Convert.ToChar(code));
+                }
+                else
+                {
+                    hira += kataChar;
+                }
+            }
+
+            return hira;
         }
 
 

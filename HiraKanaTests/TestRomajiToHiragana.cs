@@ -11,11 +11,11 @@ namespace HiraKanaTests
         public void ConvertSimpleStrings()
         {
             Assert.AreEqual(
-                new Romaji("monono").ToHiaragana(),
+                new Romaji("monono").ToHiragana(),
                 "ものの");
 
             Assert.AreEqual(
-                new Romaji("kyokutannazankyou").ToHiaragana(),
+                new Romaji("kyokutannazankyou").ToHiragana(),
                 "きょくたんなざんきょう");
         }
 
@@ -23,20 +23,34 @@ namespace HiraKanaTests
         public void ConvertTrickyStrings()
         {
             Assert.AreEqual(
-                new Romaji("teppennowebbutyotto").ToHiaragana(),
+                new Romaji("teppennowebbutyotto").ToHiragana(),
                 "てっぺんのうぇっぶちょっと");
 
             Assert.AreEqual(
-                new Romaji("tunaototsunadiji").ToHiaragana(),
+                new Romaji("tunaototsunadiji").ToHiragana(),
                 "つなおとつなぢじ");
 
             Assert.AreEqual(
-                new Romaji("bizinessu").ToHiaragana(),
+                new Romaji("bizinessu").ToHiragana(),
                 "びじねっす");
 
             Assert.AreEqual(
-                new Romaji("pyottonn").ToHiaragana(),
+                new Romaji("pyottonn").ToHiragana(),
                 "ぴょっとん");
+        }
+
+        [TestMethod]
+        public void TestOptions()
+        {
+            Assert.AreEqual(
+                new Romaji("wiwewo").ToHiragana(),
+                "うぃうぇを"
+            );
+
+            Assert.AreEqual(
+                new Romaji("wiwewo").useObsoleteKana(true).ToHiragana(),
+                "ゐゑを"
+            );
         }
     }
 }
