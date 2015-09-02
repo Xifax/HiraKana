@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace HiraKana
 {
     /* Conversion class */
-    class KanaTools
+    public class KanaTools
     {
         // Codes for kana symbols
         private static readonly int UPPERCASE_START = 0x41;
@@ -36,6 +36,17 @@ namespace HiraKana
         }
 
         /* Public API */
+        public String onTheFlyToKana(String input, Boolean hiragana = true, Boolean katakana = false)
+        {
+            String result = romajiToHiragana(input);
+
+            if(katakana)
+            {
+                return hiraganaToKatakana(result);
+            }
+
+            return result;
+        }
 
         public String toHiragana(String input)
         {

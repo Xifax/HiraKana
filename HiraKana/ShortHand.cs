@@ -20,6 +20,7 @@ namespace HiraKana
     {
         String romaji;
         KanaTools tools;
+        Boolean ime = false;
 
         /* Constructor and settings */
         public Romaji(String romaji)
@@ -31,6 +32,7 @@ namespace HiraKana
         public Romaji useImeMode(Boolean mode)
         {
             tools.useIme(mode);
+            ime = true;
             return this;
         }
 
@@ -43,11 +45,19 @@ namespace HiraKana
         /* Conversions */
         public String ToHiragana()
         {
+            if(ime)
+            {
+                return tools.onTheFlyToKana(romaji, hiragana:true);
+            }
             return tools.toHiragana(romaji);
         }
 
         public String ToKatakana()
         {
+            if(ime)
+            {
+                return tools.onTheFlyToKana(romaji, katakana:true);
+            }
             return tools.toKatakana(romaji);
         }
 
