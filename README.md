@@ -1,7 +1,7 @@
 ﻿# HiraKana
 Romaji and kana converter.
 
-Utility class with all the usual methods. Based on Wanakana.js.
+Utility class with all the usual methods. Based on Wanakana.js (wanakana.com).
 Usage examples (also included in ShortHand::Main):
 
 ```c#
@@ -14,8 +14,8 @@ Debug.WriteLine(
 ); // これはひらかなのです
 
 Debug.WriteLine(
-	new Romaji("wawiwo").useObsoleteKana(true).ToKatakana()
-); // ワヰヲ
+	new Romaji("wawiwewo").useObsoleteKana(true).ToKatakana()
+); // ワヰヱヲ
 
 /* Direct */
 
