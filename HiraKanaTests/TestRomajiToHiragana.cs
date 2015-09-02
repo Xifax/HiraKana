@@ -8,7 +8,7 @@ namespace HiraKanaTests
     public class TestRomajiToHiragana
     {
         [TestMethod]
-        public void ConvertSimpleStrings()
+        public void ConvertSimpleStringsToHiragana()
         {
             Assert.AreEqual(
                 new Romaji("monono").ToHiragana(),
@@ -20,7 +20,7 @@ namespace HiraKanaTests
         }
 
         [TestMethod]
-        public void ConvertTrickyStrings()
+        public void ConvertTrickyStringsToHiragana()
         {
             Assert.AreEqual(
                 new Romaji("teppennowebbutyotto").ToHiragana(),
@@ -40,7 +40,7 @@ namespace HiraKanaTests
         }
 
         [TestMethod]
-        public void TestOptions()
+        public void TestOptionsForHiragana()
         {
             Assert.AreEqual(
                 new Romaji("wiwewo").ToHiragana(),

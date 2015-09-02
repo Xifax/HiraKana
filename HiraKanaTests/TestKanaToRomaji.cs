@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HiraKana;
 
 namespace HiraKanaTests
 {
@@ -11,9 +12,20 @@ namespace HiraKanaTests
     public class TestKanaToRomaji
     {
         [TestMethod]
-        public void ConvertSimpleStrings()
+        public void ConverHiraganaToRomaji()
         {
+            Assert.AreEqual(
+                new Kana("きょくたんなざんきょう").ToRomaji(),
+                "kyokutannazankyou" );
 
+        }
+
+        [TestMethod]
+        public void ConverKatakanaToRomaji()
+        {
+            Assert.AreEqual(
+                new Kana("キョクタンナザンキョウ").ToRomaji(),
+                "kyokutannazankyou" );
         }
 
     }

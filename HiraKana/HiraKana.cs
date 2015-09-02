@@ -106,7 +106,7 @@ namespace HiraKana
         {
             return allTrue(input, delegate (String str)
             {
-                return (!isKatakana(str) || (!isKatakana(str)));
+                return (!isKatakana(str) && !isHiragana(str));
             });
         }
 
@@ -171,6 +171,7 @@ namespace HiraKana
             return romajiToKana(romaji, true);
         }
 
+        // TODO: move ignore case to options?
         private String romajiToKana(String romaji, Boolean ignoreCase = true)
         {
             String chunk = "";
@@ -333,7 +334,7 @@ namespace HiraKana
                     }
 
                     try {
-                        romaChar = RomajiToKana.table[chunk];
+                        romaChar = KanaToRomaji.table[chunk];
                     } catch(Exception)
                     {
                         romaChar = null;
