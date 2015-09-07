@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HiraKana;
 
 namespace HiraKanaTests
@@ -48,7 +47,7 @@ namespace HiraKanaTests
             );
 
             Assert.AreEqual(
-                new Romaji("wiwewo").useObsoleteKana(true).ToHiragana(),
+                new Romaji("wiwewo").UseObsoleteKana(true).ToHiragana(),
                 "ゐゑを"
             );
         }

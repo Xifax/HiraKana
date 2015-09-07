@@ -1,96 +1,93 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace HiraKana
 {
     /* This is an entry point, in case someone wants to run an example. */
-    static class Example
+
+    internal static class Example
     {
-        static void Main()
+        private static void Main()
         {
             Debug.WriteLine(new Romaji("korehahirakananodesu").ToHiragana());
-            Debug.WriteLine(new Romaji("wawiwewo").useObsoleteKana(true).ToKatakana());
-            Debug.WriteLine(new KanaTools().toHiragana("sorehaZOMUBIEdesuka"));
-            Debug.WriteLine(new KanaTools().isKana("あいうえお"));
+            Debug.WriteLine(new Romaji("wawiwewo").UseObsoleteKana(true).ToKatakana());
+            Debug.WriteLine(new KanaTools().ToHiragana("sorehaZOMUBIEdesuka"));
+            Debug.WriteLine(new KanaTools().IsKana("あいうえお"));
         }
     }
 
     /* Romaji methods */
+
     public class Romaji
     {
-        String romaji;
-        KanaTools tools;
-        Boolean ime = false;
+        private bool _ime;
+        private readonly string _romaji;
+        private readonly KanaTools _tools;
 
         /* Constructor and settings */
-        public Romaji(String romaji)
+
+        public Romaji(string romaji)
         {
-            this.romaji = romaji;
-            this.tools = new KanaTools();
+            _romaji = romaji;
+            _tools = new KanaTools();
         }
 
-        public Romaji useImeMode(Boolean mode)
+        public Romaji UseImeMode(bool mode)
         {
-            tools.useIme(mode);
-            ime = true;
+            _tools.UseIme(mode);
+            _ime = true;
             return this;
         }
 
-        public Romaji useObsoleteKana(Boolean mode)
+        public Romaji UseObsoleteKana(bool mode)
         {
-            tools.useObsoleteKana(mode);
+            _tools.UseObsoleteKana(mode);
             return this;
         }
 
         /* Conversions */
-        public String ToHiragana()
+
+        public string ToHiragana()
         {
-            if(ime)
-            {
-                return tools.onTheFlyToKana(romaji, hiragana:true);
-            }
-            return tools.toHiragana(romaji);
+            return _ime ? _tools.OnTheFlyToKana(_romaji) : _tools.ToHiragana(_romaji);
         }
 
-        public String ToKatakana()
+        public string ToKatakana()
         {
-            if(ime)
-            {
-                return tools.onTheFlyToKana(romaji, katakana:true);
-            }
-            return tools.toKatakana(romaji);
+            return _ime ? _tools.OnTheFlyToKana(_romaji, katakana: true) : _tools.ToKatakana(_romaji);
         }
-
     }
 
     /* Kana methods */
+
     public class Kana
     {
-        String kana;
-        KanaTools tools;
+        private readonly string _kana;
+        private readonly KanaTools _tools;
 
         /* Constructor and settings */
-        public Kana(String kana)
+
+        public Kana(string kana)
         {
-            this.kana = kana;
-            tools = new KanaTools();
+            _kana = kana;
+            _tools = new KanaTools();
         }
-        
+
 
         /* Conversions */
-        public String ToRomaji()
+
+        public string ToRomaji()
         {
-            return tools.toRomaji(kana);
+            return _tools.ToRomaji(_kana);
         }
 
-        public String ToHiragana()
+        public string ToHiragana()
         {
-            return tools.toHiragana(kana);
+            return _tools.ToHiragana(_kana);
         }
 
-        public String ToKatakana()
+        public string ToKatakana()
         {
-            return tools.toKatakana(kana);
+            return _tools.ToKatakana(_kana);
         }
     }
 }

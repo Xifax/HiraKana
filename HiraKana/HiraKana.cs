@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+// ReSharper disable UnusedMember.Local
+// ReSharper disable RedundantAssignment
 
 namespace HiraKana
 {
@@ -8,251 +10,215 @@ namespace HiraKana
     public class KanaTools
     {
         // Codes for kana symbols
-        private static readonly int UPPERCASE_START = 0x41;
-        private static readonly int UPPERCASE_END = 0x5A;
-        private static readonly int HIRAGANA_START = 0x3041;
-        private static readonly int HIRAGANA_END = 0x3096;
-        private static readonly int KATAKANA_START = 0x30A1;
-        private static readonly int KATAKANA_END = 0x30FA;
+        private const int UppercaseStart = 0x41;
+        private const int UppercaseEnd = 0x5A;
+        private const int HiraganaStart = 0x3041;
+        private const int HiraganaEnd = 0x3096;
+        private const int KatakanaStart = 0x30A1;
+        private const int KatakanaEnd = 0x30FA;
 
         // Options
-        private Boolean IME_MODE = false;
-        private Boolean USE_OBSOLETE_KANA = false;
+        private bool _imeMode;
+        private bool _useObsoleteKana;
 
         public KanaTools() { }
 
         /* Options */
 
-        public KanaTools useIme(Boolean mode)
+        public KanaTools UseIme(bool mode)
         {
-            IME_MODE = mode;
+            _imeMode = mode;
             return this;
         }
 
-        public KanaTools useObsoleteKana(Boolean flag)
+        public KanaTools UseObsoleteKana(bool flag)
         {
-            USE_OBSOLETE_KANA = flag;
+            _useObsoleteKana = flag;
             return this;
         }
 
         /* Public API */
-        public String onTheFlyToKana(String input, Boolean hiragana = true, Boolean katakana = false)
+        public string OnTheFlyToKana(string input, bool hiragana = true, bool katakana = false)
         {
-            String result = romajiToHiragana(input);
+            var result = RomajiToHiragana(input);
+            return katakana ? HiraganaToKatakana(result) : result;
+        }
 
-            if(katakana)
+        public string ToHiragana(string input)
+        {
+            if (IsRomaji(input))
             {
-                return hiraganaToKatakana(result);
+                return RomajiToHiragana(input);
             }
 
-            return result;
+            return IsKatakana(input) ? KatakanaToHiragana(input) : input;
         }
 
-        public String toHiragana(String input)
+        public string ToKatakana(string input)
         {
-            if (isRomaji(input))
+            if (IsHiragana(input))
             {
-                return romajiToHiragana(input);
+                return HiraganaToKatakana(input);
             }
 
-            if (isKatakana(input))
-            {
-                return katakanaToHiragana(input);
-            }
-
-            return input;
+            return IsRomaji(input) ? HiraganaToKatakana(RomajiToHiragana(input)) : input;
         }
 
-        public String toKatakana(String input)
+        public string ToRomaji(String input)
         {
-            if (isHiragana(input))
-            {
-                return hiraganaToKatakana(input);
-            }
-
-            if (isRomaji(input))
-            {
-                return hiraganaToKatakana(romajiToHiragana(input));
-            }
-
-            return input;
+            return HiraganaToRomaji(input);
         }
 
-        public String toRomaji(String input)
+        public string ToKana(string input)
         {
-            return hiraganaToRomaji(input);
-        }
-
-        public String toKana(String input)
-        {
-            return romajiToKana(input, false);
+            return RomajiToKana(input, false);
         }
 
 
-        public Boolean isHiragana(String input)
+        public bool IsHiragana(string input)
         {
-            return allTrue(input, delegate (String str)
-            {
-                return isCharHiragana(str[0]);
-            });
+            return AllTrue(input, str => IsCharHiragana(str[0]));
         }
 
-        public Boolean isKatakana(String input)
+        public bool IsKatakana(string input)
         {
-            return allTrue(input, delegate (String str)
-            {
-                return isCharKatakana(str[0]);
-            });
+            return AllTrue(input, str => IsCharKatakana(str[0]));
         }
 
-        public Boolean isKana(String input)
+        public bool IsKana(string input)
         {
-            return allTrue(input, delegate (String str)
-            {
-                return (isKatakana(str) || isHiragana(str));
-            });
+            return AllTrue(input, str => (IsKatakana(str) || IsHiragana(str)));
         }
 
-        public Boolean isRomaji(String input)
+        public bool IsRomaji(string input)
         {
-            return allTrue(input, delegate (String str)
-            {
-                return (!isKatakana(str) && !isHiragana(str));
-            });
+            return AllTrue(input, str => (!IsKatakana(str) && !IsHiragana(str)));
         }
 
 
 
         /* Character check methods */
 
-        private Boolean isCharInRange(char chr, int start, int end)
+        private static bool IsCharInRange(char chr, int start, int end)
         {
-            int code = (int)chr;
+            var code = (int)chr;
             return (start <= code && code <= end);
         }
 
-        private Boolean isCharVowel(char chr, Boolean includeY)
+        private static bool IsCharVowel(char chr, bool includeY)
         {
-            Regex regexp = includeY ? new Regex(@"[aeiouy]") : new Regex(@"[aeiou]");
+            var regexp = includeY ? new Regex(@"[aeiouy]") : new Regex(@"[aeiou]");
             return regexp.IsMatch(chr.ToString());
         }
 
-        private Boolean isCharConsonant(char chr, Boolean includeY)
+        private static bool IsCharConsonant(char chr, bool includeY)
         {
-            Regex regexp = includeY ? new Regex(@"[bcdfghjklmnpqrstvwxyz]") : new Regex(@"[bcdfghjklmnpqrstvwxz]");
+            var regexp = includeY ? new Regex(@"[bcdfghjklmnpqrstvwxyz]") : new Regex(@"[bcdfghjklmnpqrstvwxz]");
             return regexp.IsMatch(chr.ToString());
         }
 
         /* KanaTools character check methods */
 
-        private Boolean isCharHiragana(char chr)
+        private static bool IsCharHiragana(char chr)
         {
-            return isCharInRange(chr, HIRAGANA_START, HIRAGANA_END);
+            return IsCharInRange(chr, HiraganaStart, HiraganaEnd);
         }
 
-        private Boolean isCharKatakana(char chr)
+        private static bool IsCharKatakana(char chr)
         {
-            return isCharInRange(chr, KATAKANA_START, KATAKANA_END);
+            return IsCharInRange(chr, KatakanaStart, KatakanaEnd);
         }
 
-        private Boolean isCharKana(char chr)
+        private bool IsCharKana(char chr)
         {
-            return isCharHiragana(chr) || isCharKatakana(chr);
+            return IsCharHiragana(chr) || IsCharKatakana(chr);
         }
 
         /* Utility methods */
 
-        private Boolean allTrue(String stringToCheck, Func<String, Boolean> method)
+        private static bool AllTrue(string stringToCheck, Func<string, bool> method)
         {
-            for (int i = 0; i < stringToCheck.Length; i++)
-            {
-                if (!method(Convert.ToString(stringToCheck[i])))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return stringToCheck.All(t => method(Convert.ToString(t)));
         }
 
 
         /* Conversions */
 
-        private String romajiToHiragana(String romaji)
+        private string RomajiToHiragana(string romaji)
         {
-            return romajiToKana(romaji, true);
+            return RomajiToKana(romaji);
         }
 
         // TODO: move ignore case to options?
-        private String romajiToKana(String romaji, Boolean ignoreCase = true)
+        private string RomajiToKana(string romaji, bool ignoreCase = true)
         {
-            String chunk = "";
-            String chunkLC = "";
-            int chunkSize;
-            int position = 0;
-            int len = romaji.Length;
-            int maxChunk = 3;
-            String kana = "";
-            String kanaChar = "";
+            var chunk = "";
+            var chunkLc = "";
+            var position = 0;
+            var len = romaji.Length;
+            const int maxChunk = 3;
+            var kana = "";
+            var kanaChar = "";
 
             while (position < len)
             {
-                chunkSize = Math.Min(maxChunk, len - position);
+                var chunkSize = Math.Min(maxChunk, len - position);
 
                 while (chunkSize > 0)
                 {
                     // NB: this is (start, end - start) equivalent to Java's (start, end)
                     chunk = romaji.Substring(position, chunkSize);
-                    chunkLC = chunk.ToLower();
+                    chunkLc = chunk.ToLower();
 
-                    if ((chunkLC.Equals("lts") || chunkLC.Equals("xts")) && (len - position) >= 4)
+                    if ((chunkLc.Equals("lts") || chunkLc.Equals("xts")) && (len - position) >= 4)
                     {
                         chunkSize++;
                         // The second parameter in substring() is an end point, not a length!
                         chunk = romaji.Substring(position, chunkSize);
-                        chunkLC = chunk.ToLower();
+                        chunkLc = chunk.ToLower();
                     }
 
-                    if (Convert.ToString(chunkLC[0]).Equals("n"))
+                    if (Convert.ToString(chunkLc[0]).Equals("n"))
                     {
                         // Convert n' to ん
-                        if (IME_MODE && chunk.Length == 2 && Convert.ToString(chunkLC[1]).Equals("'"))
+                        if (_imeMode && chunk.Length == 2 && Convert.ToString(chunkLc[1]).Equals("'"))
                         {
                             chunkSize = 2;
                             chunk = "nn";
-                            chunkLC = chunk.ToLower();
+                            chunkLc = chunk.ToLower();
                         }
                         // If the user types "nto", automatically convert "n" to "ん" first
                         // "y" is excluded from the list of consonants so we can still get にゃ, にゅ, and にょ
-                        if (chunk.Length > 2 && isCharConsonant(chunkLC[1], false) && isCharVowel(chunkLC[2], true))
+                        if (chunk.Length > 2 && IsCharConsonant(chunkLc[1], false) && IsCharVowel(chunkLc[2], true))
                         {
                             chunkSize = 1;
                             // I removed the "n"->"ん" mapping because the IME wouldn't let me type "na" for "な" without returning "んあ",
                             // so the chunk needs to be manually set to a value that will map to "ん"
                             chunk = "nn";
-                            chunkLC = chunk.ToLower();
+                            chunkLc = chunk.ToLower();
                         }
                     }
 
                     // Prepare to return a small-つ because we're looking at double-consonants.
-                    if (chunk.Length > 1 && !Convert.ToString(chunkLC[0]).Equals("n")
-                        && isCharConsonant(chunkLC[0], true)
+                    if (chunk.Length > 1 && !Convert.ToString(chunkLc[0]).Equals("n")
+                        && IsCharConsonant(chunkLc[0], true)
                         && chunk[0] == chunk[1])
                     {
                         chunkSize = 1;
                         // Return a small katakana ツ when typing in uppercase
-                        if (isCharInRange(chunk[0], UPPERCASE_START, UPPERCASE_END))
+                        if (IsCharInRange(chunk[0], UppercaseStart, UppercaseEnd))
                         {
-                            chunkLC = chunk = "ッ";
+                            chunkLc = chunk = "ッ";
                         }
                         else
                         {
-                            chunkLC = chunk = "っ";
+                            chunkLc = chunk = "っ";
                         }
                     }
 
                     // Try to parse the chunk
                     kanaChar = null;
-                    RomajiToKana.table.TryGetValue(chunkLC, out kanaChar);
+                    HiraKana.RomajiToKana.Table.TryGetValue(chunkLc, out kanaChar);
 
                     // Continue, if found this item in table
                     if (kanaChar != null)
@@ -266,23 +232,23 @@ namespace HiraKana
 
                 if (kanaChar == null)
                 {
-                    chunk = convertPunctuation(Convert.ToString(chunk[0]));
+                    chunk = ConvertPunctuation(Convert.ToString(chunk[0]));
                     kanaChar = chunk;
                 }
 
-                if (USE_OBSOLETE_KANA)
+                if (_useObsoleteKana)
                 {
-                    if (chunkLC.Equals("wi"))
+                    if (chunkLc.Equals("wi"))
                     {
                         kanaChar = "ゐ";
                     }
-                    if (chunkLC.Equals("we"))
+                    if (chunkLc.Equals("we"))
                     {
                         kanaChar = "ゑ";
                     }
                 }
 
-                if (romaji.Length > (position + 1) && IME_MODE && Convert.ToString(chunkLC[0]).Equals("n"))
+                if (romaji.Length > (position + 1) && _imeMode && Convert.ToString(chunkLc[0]).Equals("n"))
                 {
                     if ((Convert.ToString(romaji[position + 1]).ToLower().Equals("y") && position == (len - 2)) || position == (len - 1))
                     {
@@ -292,9 +258,9 @@ namespace HiraKana
 
                 if (!ignoreCase)
                 {
-                    if (isCharInRange(chunk[0], UPPERCASE_START, UPPERCASE_END))
+                    if (IsCharInRange(chunk[0], UppercaseStart, UppercaseEnd))
                     {
-                        kanaChar = hiraganaToKatakana(kanaChar);
+                        kanaChar = HiraganaToKatakana(kanaChar);
                     }
                 }
 
@@ -306,32 +272,31 @@ namespace HiraKana
             return kana;
         }
 
-        public String hiraganaToRomaji(String hira)
+        public string HiraganaToRomaji(string hira)
         {
-            if (isRomaji(hira))
+            if (IsRomaji(hira))
             {
                 return hira;
             }
 
-            String chunk = "";
-            int chunkSize;
-            int cursor = 0;
-            int len = hira.Length;
-            int maxChunk = 2;
-            Boolean nextCharIsDoubleConsonant = false;
-            String roma = "";
-            String romaChar = null;
+            var chunk = "";
+            var cursor = 0;
+            var len = hira.Length;
+            const int maxChunk = 2;
+            var nextCharIsDoubleConsonant = false;
+            var roma = "";
+            string romaChar = null;
 
             while (cursor < len)
             {
-                chunkSize = Math.Min(maxChunk, len - cursor);
+                var chunkSize = Math.Min(maxChunk, len - cursor);
                 while (chunkSize > 0)
                 {
                     chunk = hira.Substring(cursor, chunkSize);
 
-                    if (isKatakana(chunk))
+                    if (IsKatakana(chunk))
                     {
-                        chunk = katakanaToHiragana(chunk);
+                        chunk = KatakanaToHiragana(chunk);
                     }
 
                     if (Convert.ToString(chunk[0]).Equals("っ") && chunkSize == 1 && cursor < (len - 1))
@@ -343,7 +308,7 @@ namespace HiraKana
 
                     // Try to parse
                     romaChar = null;
-                    KanaToRomaji.table.TryGetValue(chunk, out romaChar);
+                    KanaToRomaji.Table.TryGetValue(chunk, out romaChar);
 
                     if ((romaChar != null) && nextCharIsDoubleConsonant)
                     {
@@ -369,19 +334,16 @@ namespace HiraKana
             return roma;
         }
 
-        private String hiraganaToKatakana(String hira)
+        private static string HiraganaToKatakana(string hira)
         {
-            int code;
-            String kata = "";
+            var kata = "";
 
-            for (int i = 0; i < hira.Length; i++)
+            foreach (var hiraChar in hira)
             {
-                char hiraChar = hira[i];
-
-                if (isCharHiragana(hiraChar))
+                if (IsCharHiragana(hiraChar))
                 {
-                    code = (int)hiraChar;
-                    code += KATAKANA_START - HIRAGANA_START;
+                    var code = (int)hiraChar;
+                    code += KatakanaStart - HiraganaStart;
                     kata += Convert.ToString(Convert.ToChar(code));
                 }
                 else
@@ -393,19 +355,16 @@ namespace HiraKana
             return kata;
         }
 
-        private String katakanaToHiragana(String kata)
+        private static string KatakanaToHiragana(string kata)
         {
-            int code;
             String hira = "";
 
-            for (int i = 0; i < kata.Length; i++)
+            foreach (var kataChar in kata)
             {
-                char kataChar = kata[i];
-
-                if (isCharKatakana(kataChar))
+                if (IsCharKatakana(kataChar))
                 {
-                    code = (int)kataChar;
-                    code += HIRAGANA_START - KATAKANA_START;
+                    var code = (int)kataChar;
+                    code += HiraganaStart - KatakanaStart;
                     hira += Convert.ToString(Convert.ToChar(code));
                 }
                 else
@@ -419,19 +378,14 @@ namespace HiraKana
 
 
         // Convert punctuations: long space and dash
-        private String convertPunctuation(String input)
+        private static string ConvertPunctuation(string input)
         {
             if (input.Equals(Convert.ToString(('　'))))
             {
                 return Convert.ToString(' ');
             }
 
-            if (input.Equals(Convert.ToString('-')))
-            {
-                return Convert.ToString('ー');
-            }
-
-            return input;
+            return input.Equals(Convert.ToString('-')) ? Convert.ToString('ー') : input;
         }
 
     }

@@ -10,14 +10,13 @@ namespace HiraKanaTests
         [TestMethod]
         public void TestBooleanChecks()
         {
-            KanaTools tools = new KanaTools();
-            Assert.IsTrue(tools.isHiragana("ものの"));
-            Assert.IsFalse(tools.isHiragana("キョクタン"));
-            Assert.IsFalse(tools.isHiragana("romaji"));
-            Assert.IsTrue(tools.isKatakana("キョクタン"));
-            Assert.IsTrue(tools.isKana("キョクタンものの"));
-            Assert.IsTrue(tools.isRomaji("romaji"));
-
+            var tools = new KanaTools();
+            Assert.IsTrue(tools.IsHiragana("ものの"));
+            Assert.IsFalse(tools.IsHiragana("キョクタン"));
+            Assert.IsFalse(tools.IsHiragana("romaji"));
+            Assert.IsTrue(tools.IsKatakana("キョクタン"));
+            Assert.IsTrue(tools.IsKana("キョクタンものの"));
+            Assert.IsTrue(tools.IsRomaji("romaji"));
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HiraKana;
 
 namespace HiraKanaTests
@@ -11,19 +10,19 @@ namespace HiraKanaTests
         public void ConvertOnTheFly()
         {
             Assert.AreEqual(
-                new Romaji("monono").useImeMode(true).ToHiragana(),
+                new Romaji("monono").UseImeMode(true).ToHiragana(),
                 "ものの");
 
             Assert.AreEqual(
-                new Romaji("もnono").useImeMode(true).ToHiragana(),
+                new Romaji("もnono").UseImeMode(true).ToHiragana(),
                 "ものの");
 
             Assert.AreEqual(
-                new Romaji("もnoの").useImeMode(true).ToHiragana(),
+                new Romaji("もnoの").UseImeMode(true).ToHiragana(),
                 "ものの");
 
             Assert.AreEqual(
-                new Romaji("kyokuたんなzankyou").useImeMode(true).ToKatakana(),
+                new Romaji("kyokuたんなzankyou").UseImeMode(true).ToKatakana(),
                 "キョクタンナザンキョウ" );
         }
     }
